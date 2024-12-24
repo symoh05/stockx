@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrollable Product Rows</title>
+  <style>
+    /* General Styles */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #000;
+      border-bottom: 1px solid #333;
+    }
+
+    .navbar .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #A6E3A1;
+    }
+
+    .navbar .menu-icon,
+    .navbar .search-icon {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Empty State Message */
+    .empty-message {
+      text-align: center;
+      margin: 50px 20px;
+      font-size: 1.2rem;
+      color: #888;
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 20px 20px 10px;
+    }
+
+    /* Scrollable Row */
+    .product-row {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      padding: 10px 20px;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+    }
+
+    .product-row::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .product-row::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 10px;
+    }
+
+    .product-card {
+      flex: 0 0 calc(17.5% - 15px);
+      max-width: calc(17.5% - 15px);
+      background: #222;
+      border-radius: 8px;
+      padding: 4px;
+      text-align: center;
+      scroll-snap-align: start;
+      aspect-ratio: 5 / 1;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-card h4 {
+      margin: 8px 0 4px;
+      font-size: 0.7rem;
+    }
+
+    .product-card p {
+      font-size: 0.6rem;
+      color: #aaa;
+    }
+
+    .product-card .price {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: #A6E3A1;
+    }
+
+    .product-card .add-to-cart {
+      margin-top: 6px;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      font-size: 0.6rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .product-card .add-to-cart:hover {
+      background: #388E3C;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: #000;
+      margin-top: 20px;
+      font-size: 0.9rem;
+    }
+
+    .footer a {
+      color: #A6E3A1;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="menu-icon">☰</div>
+    <div class="logo">StockX</div>
+    <div class="search-icon">🔍</div>
+  </div>
+
+  <!-- Product Section -->
+  <div id="product-container">
+    <p class="empty-message">No products available. Please check back later.</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Explore More <a href="#">See All</a></p>
+  </div>
+
+  <script>
+    const productContainer = document.getElementById('product-container');
+
+    async function fetchProducts() {
+      try {
+        const response = await fetch('fetch_products.php');
+        const products = await response.json();
+
+        // Clear empty message if products are available
+        if (products.length > 0) {
+          productContainer.innerHTML = '';
+        }
+
+        let rowCount = Math.ceil(products.length / 6);
+
+        for (let row = 0; row < rowCount; row++) {
+          const sectionTitle = document.createElement('div');
+          sectionTitle.className = 'section-title';
+          sectionTitle.innerText = `Product Row ${row + 1}`;
+          productContainer.appendChild(sectionTitle);
+
+          const productRow = document.createElement('div');
+          productRow.className = 'product-row';
+          productRow.id = `row-${row}`;
+
+          products.slice(row * 6, (row + 1) * 6).forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+              <img src="${product.image_url}" alt="${product.name}">
+              <h4>${product.name}</h4>
+              <p>${product.description}</p>
+              <div class="price">Ksh ${parseFloat(product.price).toFixed(2)}</div>
+              <button class="add-to-cart">Add to Cart</button>
+            `;
+            productRow.appendChild(productCard);
+          });
+
+          productContainer.appendChild(productRow);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    }
+
+    fetchProducts();
+  </script>
+</body>
+</html>

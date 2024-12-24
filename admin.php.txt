@@ -1,0 +1,51 @@
+<?php
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$database = 'stockx_db';
+
+$conn = new mysqli($host, $user, $password, $database);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = $_POST['name'];
+    $description = $_POST['description'];
+    $price = $_POST['price'];
+    $image_url = $_POST['image_url'];
+
+    $sql = "INSERT INTO products (name, description, price, image_url) 
+            VALUES ('$name', '$description', $price, '$image_url')";
+    
+    if ($conn->query($sql) === TRUE) {
+        echo "Product added successfully.";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Product</title>
+</head>
+<body>
+  <h2>Add New Product</h2>
+  <form method="POST">
+    <label>Name:</label><br>
+    <input type="text" name="name" required><br>
+    <label>Description:</label><br>
+    <input type="text" name="description" required><br>
+    <label>Price:</label><br>
+    <input type="number" name="price" step="0.01" required><br>
+    <label>Image URL:</label><br>
+    <input type="text" name="image_url" required><br><br>
+    <button type="submit">Add Product</button>
+  </form>
+</body>
+</html>
